@@ -1,0 +1,82 @@
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Wide Screen */
+  .channel-list {
+    width: 20%;
+    border-right: 1px solid #dddd;
+    padding: 20px;
+    background-color: #cc8fde;
+  }
+  
+  .channel-list h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .channel-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .channel-list li {
+    margin-bottom: 5px;
+  }
+  
+  .messages {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .messages h2 {
+    margin-bottom: 10px;
+  }
+  
+  .message-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .message-input {
+    margin-top: 20px;
+  }
+  
+  #messageInput {
+    width: 70%;
+    padding: 10px;
+  }
+  
+  #sendMessageBtn {
+    width: 20%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  #sendMessageBtn:hover {
+    background-color: #45a049;
+  }
+  
+  #createChannelBtn {
+    padding: 10px;
+    background-color: #337ab7;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  #createChannelBtn:hover {
+    background-color: #286090;
+  }
+  
