@@ -9,12 +9,17 @@
     margin: 0 auto;
   }
 
+  .unauthenticated-ui,
+  .authenticated-ui {
+    display: none;
+  }
+
   /* Wide Screen */
   .channel-list {
     width: 20%;
     border-right: 1px solid #dddd;
     padding: 20px;
-    background-color: #cc8fde;
+    background-color: #fdfcfe;
   }
   
   .channel-list h2 {
@@ -38,6 +43,7 @@
   }
   
   .messages h2 {
+    font-size: 24px;
     margin-bottom: 10px;
   }
   
@@ -54,29 +60,74 @@
     width: 70%;
     padding: 10px;
   }
-  
-  #sendMessageBtn {
-    width: 20%;
+
+  .replies-pane {
+    display: none;
+    border: 1px solid #ddd;
     padding: 10px;
+}
+
+#dismiss-replies {
+    margin-top: 10px;
     background-color: #4CAF50;
     color: white;
     border: none;
+    padding: 10px 20px;
     cursor: pointer;
-  }
-  
-  #sendMessageBtn:hover {
-    background-color: #45a049;
-  }
-  
-  #createChannelBtn {
-    padding: 10px;
-    background-color: #337ab7;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  #createChannelBtn:hover {
-    background-color: #286090;
-  }
+}
+
+#sendMessageBtn {
+  width: 20%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#sendMessageBtn:hover {
+  background-color: #45a049;
+}
+
+#createChannelBtn {
+  padding: 10px;
+  background-color: #337ab7;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#createChannelBtn:hover {
+  background-color: #286090;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .channel-list {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .message-area {
+        width: 100%;
+    }
+
+    .replies-pane {
+        width: 100%;
+    }
+
+    /* Additional Styles for Narrow Screens */
+    #channel-list li {
+        text-align: center;
+    }
+
+    #dismiss-replies {
+        width: 100%;
+    }
+}
   

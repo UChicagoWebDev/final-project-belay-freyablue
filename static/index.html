@@ -3,33 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <title>Belay Chat</title>
 </head>
 <body>
 
-  <!-- Channel List Section -->
-  <div class="channel-list">
-    <h2>Channels</h2>
-    <ul>
-      <!-- Channels will be dynamically added here -->
-    </ul>
-    <button id="createChannelBtn">Create Channel</button>
+  <!-- Unauthenticated UI -->
+  <div class="unauthenticated-ui">
+    <!-- Signup Form -->
+    <div id="signup-form">
+      <h2>Create a New Account</h2>
+      <!-- signup form elements  -->
+      <form id="signup-form">
+        <!-- Input fields for signup -->
+        <input type="text" placeholder="Username" id="signup-username">
+        <input type="password" placeholder="Password" id="signup-password">
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form">
+      <h2>Sign In</h2>
+      <!-- login form -->
+      <form id="login-form">
+        <!-- Input fields for login -->
+        <input type="text" placeholder="Username" id="login-username">
+        <input type="password" placeholder="Password" id="login-password">
+        <button type="submit">Log In</button>
+      </form>
+    </div>
+
+    <div id="unauthorized-access-message">
+      <p>You need to log in or sign up to access this room.</p>
+    </div>
   </div>
 
-  <!-- Messages Section -->
-  <div class="messages">
-    <h2>Channel Name</h2>
-    <div class="message-list">
-      <!-- Messages will be dynamically added here -->
+  <!-- Authenticated UI -->
+  <div class="authenticated-ui">
+    <!-- Navigation Bar with Logout, Change Username, Change Password -->
+    <div class="navbar">
+        <button id="logout-btn">Log Out</button>
+        <button id="change-username-btn">Change Username</button>
+        <button id="change-password-btn">Change Password</button>
     </div>
-    <div class="message-input">
-      <textarea id="messageInput" placeholder="Type your message..."></textarea>
-      <button id="sendMessageBtn">Send</button>
+
+    <!-- List of Channels -->
+    <div class="channels-list">
+      <h2>Channels</h2>
+      <ul id="channel-list">
+          <!-- List of channels dynamically generated here -->
+          <!-- <li>Channel 1</li> -->     
+      </ul>
     </div>
   </div>
+
+  <div class="container">
+    <!-- Channel List Section -->
+    <div class="channel-list">
+      <h2>Channels</h2>
+      <ul>
+      <!-- Channels will be dynamically added here -->
+      </ul>
+      <button id="createChannelBtn">Create Channel</button>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="messages">
+      <h2>Channel Name</h2>
+      <div class="message-list">
+        <!-- Messages will be dynamically added here -->
+      </div>
+      <div class="message-input">
+        <textarea id="messageInput" placeholder="Type your message..."></textarea>
+        <button id="sendMessageBtn">Send</button>
+      </div>
+
+      <button id="reply-btn">Reply</button>
+    </div>
+
+    <!-- Replies Pane (Wide Screen) -->
+    <div class="replies-pane">
+      <!-- Replies dynamically generated here -->
+      <!-- <div class="reply">Reply 1</div>     
+      -->
+      <button id="dismiss-replies">Dismiss Replies</button>
+    </div>
+
+    <!-- Emoji Reactions -->
+    <div class="emoji-reactions">
+      <!-- Emoji reactions dynamically generated here -->
+      <!-- <div class="reaction">😊</div>
+      <div class="reaction">👍</div> -->
+    </div>
+
+    <!-- Users with Reaction -->
+    <div class="reaction-users">
+      <p>Users who reacted:</p>
+      <!-- Users with reaction dynamically generated here -->
+      <!-- <span>User1, </span>
+      <span>User2, </span> -->     
+    </div>
+  </div>
+
+  
 
   <!-- JavaScript file -->
-  <script src="script.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 </html>
