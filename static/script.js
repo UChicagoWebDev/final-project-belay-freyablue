@@ -1,5 +1,5 @@
 const apiBaseUrl = '/api';
-
+const signupForm = document.getElementById('signup-form');
 
 // function to fetch and display unread message counts
 function fetchUnreadCounts() {
@@ -33,6 +33,66 @@ function navigateBack() {
     // Use the History API to pop the state
     history.back();
 }
+
+function signup() {
+    const username = document.querySelector('input[name="username"]').value;
+    const password = document.querySelector('input[name="password"]').value;
+    fetch('/api/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Signup failed with status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Store the API key in browser's localStorage
+        
+        localStorage.setItem('api_key',data.api_key)
+        location.reload();
+      })
+      .catch(error => {
+        console.log('Signup failed:', error);
+      });
+}
+
+// Login function
+function login(name,password) {
+    // const name = 'newuser';
+    // const password = 'newpassword';
+    fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: name,
+        password: password, })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Store the API key in browser's localStorage
+        console.log('Login response:', data);
+        localStorage.setItem('api_key', data.api_key);
+        location.reload();
+      })
+      .catch(error => {
+        console.log('Login failed:', error);
+      });
+}
+
+document.querySelector('.login button').addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    const username = document.querySelector('input[name="username"]').value;
+    const password = document.querySelector('input[name="password"]').value;
+    login(username,password); // Call the login function
+});
+
+
 
 // Function to handle authentication and set user data in localStorage
 function authenticateUser(username, password) {
@@ -145,14 +205,29 @@ document.addEventListener('click', event => {
 });
 
 // Check if the user is authenticated when the page loads
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
+    // Select relevant UI containers
+    const unauthenticatedUI = document.getElementById('unauthenticated-ui');
+    const authenticatedUI = document.getElementById('authenticated-ui');
+    
+    // Select additional UI elements that should be hidden/shown
+    const channelsList = document.querySelector('.channels-list');
+    const messagesSection = document.querySelector('.messages');
     if (isAuthenticated()) {
-        // If authenticated, render the default page
-        // renderDefaultPage();
+        unauthenticatedUI.style.display = 'none';
+        authenticatedUI.style.display = 'block';   
+        // Show authenticated UI elements
+        channelsList.style.display = 'block';
+        messagesSection.style.display = 'block';
         fetchUnreadCounts();
     } else {
         // If not authenticated, navigate to the login/signup page
-        navigateToLoginSignup();
+        // User is unauthenticated, show unauthenticated UI
+        unauthenticatedUI.style.display = 'block';
+        authenticatedUI.style.display = 'none';
+        // Hide unauthenticated UI elements
+        channelsList.style.display = 'none';
+        messagesSection.style.display = 'none';
     }
 });
 
