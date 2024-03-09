@@ -68,23 +68,29 @@ def login():
 # Route for the main page
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return app.send_static_file('index.html')
 
-# Route for the room page
-@app.route('/room/<int:channel_id>')
-def room(channel_id):
-    # Check if the user is authenticated
-    if 'auth_key' not in request.cookies:
-        return redirect(url_for('login'))
+# # Route for the room page
+# @app.route('/room/<int:channel_id>')
+# def room(channel_id):
+#     # Check if the user is authenticated
+#     if 'auth_key' not in request.cookies:
+#         return redirect(url_for('login'))
 
-    # Check if the channel exists
-    channel = next((ch for ch in channels if ch['id'] == channel_id), None)
-    if channel:
-        return render_template('room.html', channel=channel)
-    else:
-        return redirect(url_for('index'))
+#     # Check if the channel exists
+#     channel = next((ch for ch in channels if ch['id'] == channel_id), None)
+#     if channel:
+#         return render_template('room.html', channel=channel)
+#     else:
+#         return redirect(url_for('index'))
 
-
+#  for getting unread message counts
+@app.route('/api/unread-counts')
+def get_unread_counts():
+    # Replace this with your logic to calculate unread counts
+    # For simplicity, assuming the counts are 0 for all channels
+    unread_counts = {1: 0, 2: 0, 3: 0}  # Channel IDs
+    return jsonify(unread_counts)
 
 def new_user():
     name = "Unnamed User #" + ''.join(random.choices(string.digits, k=6))
@@ -95,3 +101,7 @@ def new_user():
         (name, password, api_key),
         one=True)
     return u
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
