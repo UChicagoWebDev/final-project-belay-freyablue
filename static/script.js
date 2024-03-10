@@ -55,6 +55,7 @@ function signup() {
         
         localStorage.setItem('api_key',data.api_key)
         location.reload();
+        window.location.href = 'api/login'
       })
       .catch(error => {
         console.log('Signup failed:', error);
@@ -85,8 +86,9 @@ function login(name,password) {
       });
 }
 
-document.querySelector('.login button').addEventListener('click', function (event) {
+document.querySelector('.signup button').addEventListener('click', function (event) {
     event.preventDefault(); // Prevent the default form submission
+    signup();
     const username = document.querySelector('input[name="username"]').value;
     const password = document.querySelector('input[name="password"]').value;
     login(username,password); // Call the login function

@@ -9,7 +9,8 @@ app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 users = {}
-
+messages = {}
+user_last_read = {}
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -53,27 +54,20 @@ def signup():
     resp.set_cookie('user_id', str(u['id']))
     resp.set_cookie('user_password', u['password'])
     return resp
-    # data = request.get_json()
-    # username = data.get('username')
-    # password = data.get('password')
 
-    # # Check if the username is available 
-    # if username not in users:
-    #     # Create a new user
-    #     users[username] = {'password': password, 'channels': {}}
-    #     return jsonify({'success': True})
-    # else:
-    #     return jsonify({'error': 'Username already taken'}), 400
-    
 # API endpoint for user login
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+    user = query_db('SELECT * FROM users WHERE name = ? AND password = ?', [username, password], one=True)
     # Check username and password (add proper authentication logic)
-    if username in users and users[username]['password'] == password:
-        return jsonify({'success': True})
+    if user:
+        resp = make_response(jsonify({'success': True}), 200)
+        resp.set_cookie('user_id', str(user['id']))
+        resp.set_cookie('user_password', user['password'])
+        return resp
     else:
         return jsonify({'error': 'Invalid credentials'}), 401
 
@@ -101,8 +95,12 @@ def update_password():
 
 # Route for the main page
 @app.route('/')
+@app.route('/signup')
 @app.route('/login')
+@app.route('/authentication')
 @app.route('/room')
+@app.route('/create-channel')
+@app.route('/get-channels')
 @app.route('/room/<channel_id>')
 def index():
     return app.send_static_file('index.html')
@@ -117,17 +115,109 @@ def room(channel_id):
 
     # Check if the channel exists
     channel = query_db('SELECT * FROM channels WHERE id = ?', (channel_id,), one=True)
+
     if channel:
-        return render_template('room.html', channel=channel)
+        return app.send_static_file('index.html')
     else:
         return redirect(url_for('index'))
 
-#  for getting unread message counts
+def generate_session_token():
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=40))
+
+# Authentication endpoint
+@app.route('/api/authentication', methods=['POST'])
+def authenticate():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    user = query_db('SELECT * FROM users WHERE name = ? AND password = ?', (username, password), one=True)
+
+    if user:
+        session_token = generate_session_token()
+        response = make_response(jsonify({'success': True, 'session_token': session_token}), 200)
+        response.set_cookie('session_token', session_token)
+        return response
+    else:
+        return jsonify({'error': 'Invalid credentials'}), 401
+
+
+# New API endpoint for creating a message (change to POST)
+@app.route('/api/room/<channel_id>', methods=['POST'])
+def create_message(channel_id):
+    data = request.get_json()
+    user_id = request.cookies.get('user_id')
+    message_text = data.get('message_text')
+
+    if not (channel_id and user_id and message_text):
+        return jsonify({'error': 'Channel ID, User ID, and Message Text are required'}), 400
+
+    
+    message_id = len(messages) + 1
+    messages.append({'id': message_id, 'channel_id': channel_id, 'user_id': user_id, 'text': message_text})
+    return jsonify({'success': True, 'message_id': message_id})
+
+# New API endpoint for getting messages in a channel (remains as GET)
+@app.route('/api/room/<channel_id>')
+def get_messages(channel_id):
+    channel_messages = [msg for msg in messages if msg['channel_id'] == channel_id]
+    return jsonify({'messages': channel_messages})
+
+# New API endpoint for updating a user's last read message in a channel (change to POST)
+@app.route('/api/room/<channel_id>', methods=['POST'])
+def update_last_read(channel_id):
+    data = request.get_json()
+    user_id = data.get('user_id')
+    last_read_message_id = data.get('last_read_message_id')
+
+    if not (user_id and channel_id and last_read_message_id):
+        return jsonify({'error': 'User ID, Channel ID, and Last Read Message ID are required'}), 400
+
+    user_last_read[user_id][channel_id] = last_read_message_id
+    return jsonify({'success': True})
+
+# API endpoint for getting unread message counts (remains as GET)
 @app.route('/api/unread-counts')
 def get_unread_counts():
-    # For simplicity, assuming the counts are 0 for all channels
-    unread_counts = {1: 0, 2: 0, 3: 0}  # Channel IDs
+    user_id = request.cookies.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'User ID not found in cookies'}), 401
+
+    # Your logic for calculating unread message counts goes here
+    # For simplicity, we'll return a dictionary with counts for each channel
+    unread_counts = {}
+    channels = request.cookies.get('channels', '')
+    channels_list = channels.split(',')
+    for channel in channels:
+        channel_id = channel['id']
+        user_last_read_message_id = user_last_read[user_id].get(channel_id, 0)
+        unread_counts[channel_id] = len([msg for msg in messages if msg['channel_id'] == channel_id and msg['id'] > user_last_read_message_id])
+
     return jsonify(unread_counts)
+
+
+# New API endpoint for creating a channel (change to POST)
+@app.route('/api/create-channel', methods=['POST'])
+def create_channel():
+    data = request.get_json()
+    channel_name = data.get('channel_name')
+
+    if not channel_name:
+        return jsonify({'error': 'Channel name is required'}), 400
+
+    channels = request.cookies.get('channels', '')
+    channels_list = channels.split(',')  
+    channel_id = len(channels_list) + 1
+    channels_list.append(f'{channel_id}:{channel_name}')
+    response = make_response(jsonify({'success': True, 'channel_id': channel_id}), 200)
+    response.set_cookie('channels', ','.join(channels_list))
+    return response
+
+@app.route('/api/get-channels')
+def get_channels():
+    channels = request.cookies.get('channels', '')
+    channels_list = channels.split(',')
+    return jsonify({'channels': channels_list})
 
 def new_user():
     name = "Unnamed User #" + ''.join(random.choices(string.digits, k=6))
