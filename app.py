@@ -188,7 +188,7 @@ def get_unread_counts():
     unread_counts = {}
     channels = request.cookies.get('channels', '')
     channels_list = channels.split(',')
-    for channel in channels:
+    for channel in channels_list:
         channel_id = channel['id']
         user_last_read_message_id = user_last_read[user_id].get(channel_id, 0)
         unread_counts[channel_id] = len([msg for msg in messages if msg['channel_id'] == channel_id and msg['id'] > user_last_read_message_id])

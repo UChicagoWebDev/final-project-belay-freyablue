@@ -86,6 +86,41 @@ function login(name,password) {
       });
 }
 
+// Function to create a new channel
+function createChannel() {
+    var formData = {
+      channel_name: document.getElementById('channel_name').value,
+    };
+  
+    fetch('/api/create-channel', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+}
+
+// Function to get the list of channels
+function getChannels() {
+  fetch('/api/get-channels')
+    .then(response => response.json())
+    .then(data => {
+      // Handle the response
+      console.log(data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+}
+
 document.querySelector('.signup button').addEventListener('click', function (event) {
     event.preventDefault(); // Prevent the default form submission
     signup();
@@ -99,7 +134,7 @@ document.querySelector('.signup button').addEventListener('click', function (eve
 // Function to handle authentication and set user data in localStorage
 function authenticateUser(username, password) {
     // Perform authentication using your API
-    fetch(`${apiBaseUrl}/authenticate`, {
+    fetch(`${apiBaseUrl}/authentication`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -156,8 +191,6 @@ function navigateToLoginSignup() {
 function renderLoginSignupPage() {
     // Implement the rendering logic for the login/signup page
     // This may include showing login/signup forms, handling form submissions, etc.
-
-    // Example: Show a login form
     const loginForm = document.getElementById('login-form');
     loginForm.style.display = 'block';
 }
